@@ -22,15 +22,15 @@ class Data_Loader:
 				self.source_lines = self.source_lines[0:self.max_sentences]
 				self.target_lines = self.target_lines[0:self.max_sentences]
 
-			print "Source Sentences", len(self.source_lines)
-			print "Target Sentences", len(self.target_lines)
+			print("Source Sentences", len(self.source_lines))
+			print("Target Sentences", len(self.target_lines))
 
 			self.bucket_quant = options['bucket_quant']
 			self.source_vocab = self.build_vocab(self.source_lines)
 			self.target_vocab = self.build_vocab(self.target_lines)
 
-			print "SOURCE VOCAB SIZE", len(self.source_vocab)
-			print "TARGET VOCAB SIZE", len(self.target_vocab)
+			print("SOURCE VOCAB SIZE", len(self.source_vocab))
+			print("TARGET VOCAB SIZE", len(self.target_vocab))
 		
 		elif options['model_type'] == 'generator':
 			dir_name = options['dir_name']
@@ -64,10 +64,10 @@ class Data_Loader:
 		frequent_keys = [ (-len(buckets[key]), key) for key in buckets ]
 		frequent_keys.sort()
 
-		print "Source", self.inidices_to_string( buckets[ frequent_keys[3][1] ][5][0], self.source_vocab)
-		print "Target", self.inidices_to_string( buckets[ frequent_keys[3][1] ][5][1], self.target_vocab)
+		print("Source", self.inidices_to_string( buckets[ frequent_keys[3][1] ][5][0], self.source_vocab))
+		print("Target", self.inidices_to_string( buckets[ frequent_keys[3][1] ][5][1], self.target_vocab))
 		
-		print len(frequent_keys)
+		print(len(frequent_keys))
 		return buckets, self.source_vocab, self.target_vocab, frequent_keys
 
 
@@ -106,7 +106,7 @@ class Data_Loader:
 				buckets[new_length] = [(source_lines[i], target_lines[i])]
 
 			if i%1000 == 0:
-				print "Loading", i
+				print("Loading", i)
 			
 		return buckets
 

@@ -257,7 +257,7 @@ class Byte_net_model:
 		if encoder_embedding != None:
 			# CONDITION WITH ENCODER EMBEDDING FOR THE TRANSLATION MODEL
 			curr_input = tf.concat(2, [input_, encoder_embedding])
-			print "Decoder Input", curr_input
+			print("Decoder Input", curr_input)
 			
 
 		for layer_no, dilation in enumerate(options['decoder_dilations']):

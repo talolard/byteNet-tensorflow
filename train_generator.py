@@ -55,7 +55,7 @@ def main():
 
 	dl = data_loader.Data_Loader({'model_type' : 'generator', 'dir_name' : args.data_dir})
 	text_samples = dl.load_generator_data( config['sample_size'])
-	print text_samples.shape
+	print(text_samples.shape)
 
 	for i in range(args.max_epochs):
 		batch_no = 0
@@ -65,11 +65,11 @@ def main():
 			_, loss, prediction = sess.run( [optim, bn_tensors['loss'], bn_tensors['prediction']], feed_dict = {
 				bn_tensors['sentence'] : text_batch
 				})
-			print "-------------------------------------------------------"
-			print utils.list_to_string(prediction)
-			print "Loss", i, batch_no, loss
-			print "********************************************************"
-			# print prediction
+			print("-------------------------------------------------------")
+			print(utils.list_to_string(prediction))
+			print("Loss", i, batch_no, loss)
+			print("********************************************************")
+			# print(prediction)
 			batch_no += 1
 			
 			if (batch_no % 500) == 0:
