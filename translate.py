@@ -9,23 +9,7 @@ import utils
 
 # STILL IN DEVELOPMENT...
 def main():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--model_path', type=str, default='Data/Models/model_translation_epoch_1.ckpt',
-                        help='Pre-Trained Model Path')
-    parser.add_argument('--data_dir', type=str, default='Data',
-                        help='Data Directory')
-    parser.add_argument('--num_char', type=int, default=1000,
-                        help='seed')
-    parser.add_argument('--translator_max_length', type=int, default=500,
-                        help='translator_max_length')
-
-    parser.add_argument('--output_file', type=str, default='sample.txt',
-                        help='Output File')
-
-    args = parser.parse_args()
-
-    config = model_config.translator_config
+    args, config = get_args_and_config()
 
     source_sentence = None
     with open('Data/MachineTranslation/news-commentary-v11.de-en.de') as f:
@@ -57,37 +41,7 @@ def main():
     dl = data_loader.Data_Loader(data_loader_options)
     # buckets, source_vocab, target_vocab, frequent_keys = dl.load_translation_data()
 
-    source_ = []
-    target_ = []
-    for i in range(len(source_sentences)):
-        source_sentence = source_sentences[i]
-
-        source = [dl.source_vocab[s] for s in source_sentence]
-        source += [dl.source_vocab['eol']]
-
-        new_length = args.translator_max_length
-        # bucket_quant = args.bucket_quant
-        # if new_length % bucket_quant > 0:
-        # 	new_length = ((new_length/bucket_quant) + 1 ) * bucket_quant
-
-        for i in range(len(source), new_length):
-            source += [dl.source_vocab['padding']]
-
-        target = [dl.target_vocab['init']]
-        for j in range(1, new_length + 1):
-            target += [dl.target_vocab['padding']]
-
-        source_.append(source)
-        target_.append(target)
-
-    source = np.array(source_)
-    target = np.array(target_)
-    # print(source_)
-    # source = np.array(source_, dtype='int32')
-    # target = np.array(target_, dtype='int32')
-
-    # print(source)
-    # print(target)
+    source, target = prepare_source_target_arrays(args, dl, source_sentences)
 
     model_options = {
         'n_source_quant': len(dl.source_vocab),
@@ -129,6 +83,51 @@ def main():
         res = dl.inidices_to_string(input_batch[0], dl.target_vocab)
         print("RES")
         print(res)
+
+
+def get_args_and_config():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model_path', type=str, default='Data/Models/model_translation_epoch_1.ckpt',
+                        help='Pre-Trained Model Path')
+    parser.add_argument('--data_dir', type=str, default='Data',
+                        help='Data Directory')
+    parser.add_argument('--num_char', type=int, default=1000,
+                        help='seed')
+    parser.add_argument('--translator_max_length', type=int, default=500,
+                        help='translator_max_length')
+    parser.add_argument('--output_file', type=str, default='sample.txt',
+                        help='Output File')
+    args = parser.parse_args()
+    config = model_config.translator_config
+    return args, config
+
+
+def prepare_source_target_arrays(args, dl, source_sentences):
+    source_ = []
+    target_ = []
+    for i in range(len(source_sentences)):
+        source_sentence = source_sentences[i]
+
+        source = [dl.source_vocab[s] for s in source_sentence]
+        source += [dl.source_vocab['eol']]
+
+        new_length = args.translator_max_length
+        # bucket_quant = args.bucket_quant
+        # if new_length % bucket_quant > 0:
+        # 	new_length = ((new_length/bucket_quant) + 1 ) * bucket_quant
+
+        for i in range(len(source), new_length):
+            source += [dl.source_vocab['padding']]
+
+        target = [dl.target_vocab['init']]
+        for j in range(1, new_length + 1):
+            target += [dl.target_vocab['padding']]
+
+        source_.append(source)
+        target_.append(target)
+    source = np.array(source_)
+    target = np.array(target_)
+    return source, target
 
 
 def weighted_pick(weights):

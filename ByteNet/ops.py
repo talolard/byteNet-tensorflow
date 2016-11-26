@@ -20,7 +20,7 @@ def batch_to_time(value, dilation, name=None):
         prepared = tf.reshape(value, [dilation, -1, shape[2]])
         transposed = tf.transpose(prepared, perm=[1, 0, 2])
         return tf.reshape(transposed,
-                          [(shape[0] / dilation), -1, shape[2]])
+                          [int(shape[0] / dilation), -1, shape[2]])
 
 
 def conv1d(input_, output_channels,
@@ -45,7 +45,7 @@ def dilated_conv1d(input_, output_channels, dilation,
         padded = tf.pad(input_, padding)
     else:
 
-        padding = [[0, 0], [(filter_width - 1) * dilation / 2, (filter_width - 1) * dilation / 2], [0, 0]]
+        padding = [[0, 0], [(filter_width - 1) * int(dilation / 2), (filter_width - 1) * int(dilation / 2)], [0, 0]]
         padded = tf.pad(input_, padding)
 
     if dilation > 1:
