@@ -135,9 +135,9 @@ def get_args():
                         help='Momentum for Adam Update')
     parser.add_argument('--resume_model', type=str, default=None,
                         help='Pre-Trained Model Path, to resume from')
-    parser.add_argument('--source_file', type=str, default='Data/MachineTranslation/news-commentary-v11.de-en.de',
+    parser.add_argument('--source_file', type=str, default='Data/bible/input.txt',
                         help='Source File')
-    parser.add_argument('--target_file', type=str, default='Data/MachineTranslation/news-commentary-v11.de-en.en',
+    parser.add_argument('--target_file', type=str, default='Data/bible/target.txt',
                         help='Target File')
     args = parser.parse_args()
     return args

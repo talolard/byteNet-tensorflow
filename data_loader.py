@@ -56,8 +56,11 @@ class Data_Loader:
         source_lines = []
         target_lines = []
         for i in range(len(self.source_lines)):
-            source_lines.append(self.string_to_indices(self.source_lines[i], self.source_vocab))
-            target_lines.append(self.string_to_indices(self.target_lines[i], self.target_vocab))
+            try:
+                source_lines.append(self.string_to_indices(self.source_lines[i], self.source_vocab))
+                target_lines.append(self.string_to_indices(self.target_lines[i], self.target_vocab))
+            except:
+                break
 
         buckets = self.create_buckets(source_lines, target_lines)
 
@@ -78,32 +81,34 @@ class Data_Loader:
 
         buckets = {}
         for i in range(len(source_lines)):
+            try:
+                source_lines[i] = np.concatenate((source_lines[i], [source_vocab['eol']]))
+                target_lines[i] = np.concatenate(([target_vocab['init']], target_lines[i], [target_vocab['eol']]))
 
-            source_lines[i] = np.concatenate((source_lines[i], [source_vocab['eol']]))
-            target_lines[i] = np.concatenate(([target_vocab['init']], target_lines[i], [target_vocab['eol']]))
+                sl = len(source_lines[i])
+                tl = len(target_lines[i])
 
-            sl = len(source_lines[i])
-            tl = len(target_lines[i])
+                new_length = max(sl, tl)
+                if new_length % bucket_quant > 0:
+                    new_length = int(((new_length / bucket_quant) + 1)) * bucket_quant
 
-            new_length = max(sl, tl)
-            if new_length % bucket_quant > 0:
-                new_length = int(((new_length / bucket_quant) + 1)) * bucket_quant
+                s_padding = np.array([source_vocab['padding'] for ctr in range(sl, new_length)])
 
-            s_padding = np.array([source_vocab['padding'] for ctr in range(sl, new_length)])
+                # NEED EXTRA PADDING FOR TRAINING..
+                t_padding = np.array([target_vocab['padding'] for ctr in range(tl, new_length + 1)])
 
-            # NEED EXTRA PADDING FOR TRAINING..
-            t_padding = np.array([target_vocab['padding'] for ctr in range(tl, new_length + 1)])
+                source_lines[i] = np.concatenate([source_lines[i], s_padding])
+                target_lines[i] = np.concatenate([target_lines[i], t_padding])
 
-            source_lines[i] = np.concatenate([source_lines[i], s_padding])
-            target_lines[i] = np.concatenate([target_lines[i], t_padding])
+                if new_length in buckets:
+                    buckets[new_length].append((source_lines[i], target_lines[i]))
+                else:
+                    buckets[new_length] = [(source_lines[i], target_lines[i])]
 
-            if new_length in buckets:
-                buckets[new_length].append((source_lines[i], target_lines[i]))
-            else:
-                buckets[new_length] = [(source_lines[i], target_lines[i])]
-
-            if i % 1000 == 0:
-                print("Loading", i)
+                if i % 1000 == 0:
+                    print("Loading", i)
+            except:
+                break
 
         return buckets
 
